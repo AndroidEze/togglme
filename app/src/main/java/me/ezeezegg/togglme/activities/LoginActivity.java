@@ -40,6 +40,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -90,52 +91,29 @@ public class LoginActivity extends AppCompatActivity implements AsyncVolleyRespo
     private void login() {
         String email = mEmailView.getText().toString();
         String password = mPasswordView.getText().toString();
-        //VolleyHelper volleyHelper = new VolleyHelper(this,Urls.urlLoginToggl, this);
-        makeVolleyRequest(email, password);
+        VolleyHelper volleyHelper = new VolleyHelper(this,Urls.urlLoginToggl, this);
+        volleyHelper.makeVolleyRequest(email, password);
+//        makeVolleyRequest(email, password);
     }
 
     @Override
-    public void AsyncVolleyFinish(JSONObject jsonObject) {
-        Log.d("test", String.valueOf(jsonObject));
+    public void AsyncVolleyFinish(String response) {
+        JSONObject parse = null;
+        try {
+            parse = new JSONObject(response);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        try {
+            Toast.makeText(this, "response: " + parse.getString("since"), Toast.LENGTH_SHORT ).show();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
-    public void AsyncVolleyError(JSONObject error) {
-        Log.d("test", String.valueOf(error));
-    }
-
-    public void makeVolleyRequest(final String email, final String password) {
-        StringRequest request =  new StringRequest(Request.Method.GET  , Urls.urlLoginToggl, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                Toast.makeText(context, "response: " + response, Toast.LENGTH_SHORT ).show();
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Toast.makeText(context, "ERROR: " + error, Toast.LENGTH_SHORT ).show();
-            }
-        }) {
-            @Override
-            protected Map<String,String> getParams(){
-                Map<String,String> params = new HashMap<String, String>();
-                params.put("username",email);
-                params.put("password",password);
-                return params;
-            }
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String,String> params = new HashMap<String, String>();
-                params.put("Authorization",
-                        String.format("Basic %s", Base64.encodeToString(
-                                String.format("%s:%s", email, password).getBytes(), Base64.DEFAULT)));
-                params.put("username" , email );
-                params.put("password" , password );
-                return params;
-            }
-        };
-        request.setRetryPolicy(new DefaultRetryPolicy(DefaultRetryPolicy.DEFAULT_TIMEOUT_MS, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        VolleyApplication.getInstance().getRequestQueue().add(request);
+    public void AsyncVolleyError(String error) {
+        Toast.makeText(context, "ERROR: " + error, Toast.LENGTH_SHORT ).show();
     }
 }
 

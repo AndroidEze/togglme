@@ -13,6 +13,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
@@ -20,6 +21,7 @@ import java.util.Map;
 
 import me.ezeezegg.togglme.Interfaces.AsyncVolleyResponse;
 import me.ezeezegg.togglme.applications.VolleyApplication;
+import me.ezeezegg.togglme.constants.Urls;
 
 /**
  * Created by egarcia on 7/5/16.
@@ -39,12 +41,14 @@ public class VolleyHelper {
         StringRequest request =  new StringRequest(Request.Method.GET  , url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                Toast.makeText(context, "response: " + response, Toast.LENGTH_SHORT ).show();
+                //Toast.makeText(context, "response: " + response, Toast.LENGTH_SHORT ).show();
+                asyncVolleyResponse.AsyncVolleyFinish(response);
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Toast.makeText(context, "ERROR: " + error, Toast.LENGTH_SHORT ).show();
+                //Toast.makeText(context, "ERROR: " + error, Toast.LENGTH_SHORT ).show();
+                asyncVolleyResponse.AsyncVolleyError("error");
             }
         }) {
             @Override
